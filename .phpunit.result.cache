@@ -1,0 +1,1 @@
+{"version":2,"defects":{"Tests\\Feature\\AuthRegisterTest::test_user_can_register_via_api":7},"times":{"Tests\\Feature\\AuthRegisterTest::test_user_can_register_via_api":0.178}}
