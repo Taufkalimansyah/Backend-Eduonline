@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
         Tugas::create([
             'kelas_id' => $kelas->id, 'judul' => 'Tugas 1: Membangun Komponen Card',
             'instruksi' => 'Buat komponen card reusable dengan props title dan image.',
-            'deadline' => now()->addDays(10),
+            'deadline' => now()->addDays(10), ##update deadline 10 hari dari sekarang
         ]);
     }
 }
