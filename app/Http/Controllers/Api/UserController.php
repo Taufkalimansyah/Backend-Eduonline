@@ -29,6 +29,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'role' => 'required|in:dosen,mahasiswa',
+            'nim' => 'nullable|string|max:50|unique:users,nim',
+            'bidang' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
@@ -37,6 +39,20 @@ class UserController extends Controller
         ]);
 
         return response()->json($user, 201);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'nim' => 'nullable|string|max:50|unique:users,nim,' . $user->id,
+            'bidang' => 'nullable|string|max:255',
+        ]);
+
+        $user->update($data);
+
+        return response()->json($user);
     }
 
     public function destroy(User $user)

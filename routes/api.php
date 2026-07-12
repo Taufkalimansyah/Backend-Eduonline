@@ -55,10 +55,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Pengumuman — admin buat, semua role baca
     Route::get('/announcements', [PengumumanController::class, 'index']);
-    Route::post('/announcements', [PengumumanController::class, 'store'])->middleware('role:admin');
+    Route::post('/announcements', [PengumumanController::class, 'store']);
+    Route::get('/announcements/{pengumuman}', [PengumumanController::class, 'show']);
+    Route::put('/announcements/{pengumuman}', [PengumumanController::class, 'update']);
+    Route::delete('/announcements/{pengumuman}', [PengumumanController::class, 'destroy']);
 
     // User CRUD — khusus admin
-    Route::get('/users', [UserController::class, 'index'])->middleware('role:admin');
-    Route::post('/users', [UserController::class, 'store'])->middleware('role:admin');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('role:admin');
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });
