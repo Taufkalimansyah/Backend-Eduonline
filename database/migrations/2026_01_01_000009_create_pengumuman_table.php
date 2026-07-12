@@ -9,13 +9,27 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('pengumuman', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('author_id')->constrained('users')->cascadeOnDelete();
-            $table->string('judul');
-            $table->text('isi');
-            $table->timestamps();
-        });
-    }
+
+        $table->uuid('id')->primary();
+
+        $table->foreignUuid('pembuat_id')
+            ->constrained('users')
+            ->cascadeOnDelete();
+
+        $table->string('judul');
+
+        $table->text('isi');
+
+        $table->date('tanggal');
+
+        $table->enum('status',[
+            'aktif',
+            'nonaktif'
+        ])->default('aktif');
+
+        $table->timestamps();
+    });
+        }
 
     public function down(): void
     {

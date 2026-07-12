@@ -2,18 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pengumuman extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'pengumuman';
-    protected $fillable = ['author_id', 'judul', 'isi'];
 
-    public function author()
+    protected $fillable = [
+        'judul',
+        'isi',
+        'pembuat_id',
+        'tanggal',
+        'status'
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date',
+    ];
+
+    public function pembuat()
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->belongsTo(User::class, 'pembuat_id');
     }
 }

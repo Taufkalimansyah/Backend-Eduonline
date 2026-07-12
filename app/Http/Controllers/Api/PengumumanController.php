@@ -6,31 +6,67 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 
-/**
- * Dashboard Admin -> "Manajemen Pengumuman Global".
- * Endpoint index() dipanggil oleh dashboard dosen & mahasiswa untuk
- * menampilkan pengumuman secara langsung (polling ringan setiap kali
- * dashboard dibuka, bisa ditingkatkan ke WebSocket/Pusher untuk realtime).
- */
 class PengumumanController extends Controller
 {
+    // GET /api/pengumuman
     public function index()
     {
-        return response()->json(Pengumuman::with('author:id,name')->latest()->get());
+        return Pengumuman::with('pembuat')
+            ->latest()
+            ->get();
     }
 
+    // POST /api/pengumuman
     public function store(Request $request)
+    {
+        $data = $request->validate([
+            'judul' => 'required|string|max:255|unique:pengumuman,judul',
+            'isi' => 'required|string',
+            'tanggal' => 'required|date',
+            'status' => 'required|in:aktif,nonaktif',
+        ]);
+
+        $data['pembuat_id'] = auth()->id();
+
+        $pengumuman = Pengumuman::create($data);
+
+        return response()->json([
+            'message' => 'Pengumuman berhasil dibuat',
+            'data' => $pengumuman
+        ],201);
+    }
+
+    // GET /api/pengumuman/{id}
+    public function show(Pengumuman $pengumuman)
+    {
+        return $pengumuman->load('pembuat');
+    }
+
+    // PUT /api/pengumuman/{id}
+    public function update(Request $request, Pengumuman $pengumuman)
     {
         $data = $request->validate([
             'judul' => 'required|string|max:255',
             'isi' => 'required|string',
+            'tanggal' => 'required|date',
+            'status' => 'required|in:aktif,nonaktif',
         ]);
 
-        $pengumuman = Pengumuman::create([
-            ...$data,
-            'author_id' => $request->user()->id,
-        ]);
+        $pengumuman->update($data);
 
-        return response()->json($pengumuman, 201);
+        return response()->json([
+            'message' => 'Pengumuman berhasil diupdate',
+            'data' => $pengumuman
+        ]);
+    }
+
+    // DELETE /api/pengumuman/{id}
+    public function destroy(Pengumuman $pengumuman)
+    {
+        $pengumuman->delete();
+
+        return response()->json([
+            'message' => 'Pengumuman berhasil dihapus'
+        ]);
     }
 }
