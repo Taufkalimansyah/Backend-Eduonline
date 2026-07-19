@@ -20,7 +20,8 @@ class Kelas extends Model
 
     public function mahasiswa()
     {
-        return $this->belongsToMany(User::class, 'kelas_mahasiswa', 'kelas_id', 'mahasiswa_id');
+        return $this->belongsToMany(User::class, 'kelas_mahasiswa', 'kelas_id', 'mahasiswa_id')->using(KelasMahasiswa::class)
+        ->withTimestamps();
     }
 
     public function materi()

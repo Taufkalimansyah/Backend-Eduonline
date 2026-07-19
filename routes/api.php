@@ -29,10 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Kelas — dipakai Dashboard Mahasiswa & Dosen
     Route::get('/classes', [KelasController::class, 'index']);
-    Route::get('/classes/{kela}', [KelasController::class, 'show']);
+    Route::get('/classes/available', [KelasController::class, 'available'])->middleware('role:mahasiswa'); // WAJIB DI ATAS
+    Route::get('/classes/{kela}', [KelasController::class, 'show']);           // ini di bawahnya
     Route::post('/classes', [KelasController::class, 'store'])->middleware('role:dosen');
     route::put('/classes/{kela}', [KelasController::class, 'update'])->middleware('role:dosen');
     route::delete('/classes/{kela}', [KelasController::class, 'destroy'])->middleware('role:dosen');
+    Route::post('/classes/{kela}/enroll', [KelasController::class, 'enroll'])->middleware('role:mahasiswa');
 
     // Materi — upload oleh dosen, download oleh mahasiswa
     Route::get('/materials', [MateriController::class, 'index']);

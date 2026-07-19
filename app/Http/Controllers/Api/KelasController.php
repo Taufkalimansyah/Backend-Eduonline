@@ -103,4 +103,41 @@ class KelasController extends Controller
             'message' => 'Kelas berhasil dihapus.'
         ]);
     }
+
+    /**
+ * GET kelas yang BELUM diikuti mahasiswa (untuk pilihan KRS)
+ */
+public function available(Request $request)
+{
+    $user = $request->user();
+
+    $kelas = Kelas::with('dosen')
+        ->whereDoesntHave('mahasiswa', fn ($q) => $q->where('users.id', $user->id))
+        ->get();
+
+    return response()->json($kelas);
+}
+
+/**
+ * POST mahasiswa mendaftarkan diri ke kelas (self-enroll KRS)
+ */
+public function enroll(Request $request, Kelas $kela)
+{
+    $user = $request->user();
+
+    $sudahTerdaftar = $kela->mahasiswa()->where('users.id', $user->id)->exists();
+
+    if ($sudahTerdaftar) {
+        return response()->json([
+            'message' => 'Anda sudah terdaftar di kelas ini.'
+        ], 422);
+    }
+
+    $kela->mahasiswa()->attach($user->id);
+
+    return response()->json([
+        'message' => 'Berhasil mendaftar ke kelas.',
+        'kelas' => $kela->load('dosen')
+    ], 201);
+}
 }
