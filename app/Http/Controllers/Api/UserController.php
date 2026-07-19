@@ -20,6 +20,10 @@ class UserController extends Controller
                 ->orWhere('email', 'like', "%$search%"));
         }
 
+        if ($role = $request->query('role')) {
+            $query->where('role', $role);
+        }
+
         return response()->json($query->latest()->get());
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Absensi;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 
@@ -11,14 +12,12 @@ class AbsensiController extends Controller
 {
     public function index(Kelas $kela)
     {
-        $rekap = $kela->absensi()
-            ->selectRaw('mahasiswa_id, status, count(*) as jumlah')
-            ->groupBy('mahasiswa_id', 'status')
-            ->with('mahasiswa:id,name')
-            ->get()
-            ->groupBy('mahasiswa_id');
+        $absensi = $kela->absensi()
+            ->with('mahasiswa:id,name,nim')
+            ->orderBy('tanggal', 'desc')
+            ->get();
 
-        return response()->json($rekap);
+        return response()->json($absensi);
     }
 
     public function store(Request $request, Kelas $kela)
@@ -32,5 +31,24 @@ class AbsensiController extends Controller
         $absensi = $kela->absensi()->create($data);
 
         return response()->json($absensi, 201);
+    }
+
+    public function update(Request $request, Absensi $absensi)
+    {
+        $data = $request->validate([
+            'tanggal' => 'required|date',
+            'status' => 'required|in:hadir,izin,alpha',
+        ]);
+
+        $absensi->update($data);
+
+        return response()->json($absensi);
+    }
+
+    public function destroy(Absensi $absensi)
+    {
+        $absensi->delete();
+
+        return response()->json(['message' => 'Absensi deleted successfully']);
     }
 }
