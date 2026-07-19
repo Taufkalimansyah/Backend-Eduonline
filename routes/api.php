@@ -46,6 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/classes/{kela}/assignments', [TugasController::class, 'store'])->middleware('role:dosen');
 
     // Pengumpulan tugas — submit oleh mahasiswa, dinilai oleh dosen
+    Route::get('/assignments', [TugasController::class, 'index']);
+    Route::get('/assignments/{tuga}', [TugasController::class, 'show']);
+    Route::post('/classes/{kela}/assignments', [TugasController::class, 'store'])->middleware('role:dosen');
+    Route::put('/assignments/{tuga}', [TugasController::class, 'update'])->middleware('role:dosen');
+    Route::delete('/assignments/{tuga}', [TugasController::class, 'destroy'])->middleware('role:dosen');
     Route::post('/assignments/{tugas}/submissions', [PengumpulanTugasController::class, 'store'])->middleware('role:mahasiswa');
     Route::get('/submissions', [PengumpulanTugasController::class, 'indexForDosen'])->middleware('role:dosen');
     Route::put('/submissions/{pengumpulan_tugas}', [PengumpulanTugasController::class, 'grade'])->middleware('role:dosen');
@@ -58,6 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Absensi — dosen kelola & lihat rekap
     Route::get('/classes/{kela}/attendance', [AbsensiController::class, 'index']);
     Route::post('/classes/{kela}/attendance', [AbsensiController::class, 'store'])->middleware('role:dosen');
+    Route::put('/attendance/{absensi}', [AbsensiController::class, 'update'])->middleware('role:dosen');
+    Route::delete('/attendance/{absensi}', [AbsensiController::class, 'destroy'])->middleware('role:dosen');
     
 
     // Pengumuman — admin buat, semua role baca

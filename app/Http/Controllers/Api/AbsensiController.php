@@ -10,27 +10,31 @@ use Illuminate\Http\Request;
 class AbsensiController extends Controller
 {
     public function index(Kelas $kela)
-    {
-        $rekap = $kela->absensi()
-            ->selectRaw('mahasiswa_id, status, count(*) as jumlah')
-            ->groupBy('mahasiswa_id', 'status')
-            ->with('mahasiswa:id,name')
-            ->get()
-            ->groupBy('mahasiswa_id');
+{
+    $absensi = $kela->absensi()
+        ->with('mahasiswa:id,name,nim')
+        ->orderBy('tanggal', 'desc')
+        ->get();
 
-        return response()->json($rekap);
-    }
+    return response()->json($absensi);
+}
 
-    public function store(Request $request, Kelas $kela)
-    {
-        $data = $request->validate([
-            'mahasiswa_id' => 'required|exists:users,id',
-            'tanggal' => 'required|date',
-            'status' => 'required|in:hadir,izin,alpha',
-        ]);
+public function update(Request $request, $id)
+{
+    $data = $request->validate([
+        'tanggal' => 'sometimes|date',
+        'status' => 'sometimes|in:hadir,izin,alpha',
+    ]);
 
-        $absensi = $kela->absensi()->create($data);
+    $absensi = \App\Models\Absensi::findOrFail($id);
+    $absensi->update($data);
 
-        return response()->json($absensi, 201);
-    }
+    return response()->json($absensi);
+}
+
+public function destroy($id)
+{
+    \App\Models\Absensi::findOrFail($id)->delete();
+    return response()->json(['message' => 'Absensi berhasil dihapus']);
+}
 }
