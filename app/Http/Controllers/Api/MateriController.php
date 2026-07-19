@@ -23,8 +23,7 @@ class MateriController extends Controller
 
         return response()->json($materi);
     }
-
-
+    
     /**
      * Detail materi
      */
@@ -187,10 +186,6 @@ class MateriController extends Controller
         ]);
 
     }
-
-
-
-
 
     /**
      * Download file
