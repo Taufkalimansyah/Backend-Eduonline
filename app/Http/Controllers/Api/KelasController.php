@@ -56,4 +56,51 @@ class KelasController extends Controller
 
         return response()->json($kelas, 201);
     }
+
+    // Update kelas
+    public function update(Request $request, Kelas $kela)
+    {
+        // Pastikan hanya dosen pemilik kelas yang bisa update
+        if ($kela->dosen_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses untuk mengubah kelas ini.'
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'nama' => 'required|string|max:255',
+            'kode' => 'required|string|unique:kelas,kode,' . $kela->id,
+            'mahasiswa_ids' => 'array',
+        ]);
+
+        $kela->update([
+            'nama' => $data['nama'],
+            'kode' => $data['kode'],
+        ]);
+
+        // update relasi mahasiswa jika dikirim
+        if (isset($data['mahasiswa_ids'])) {
+            $kela->mahasiswa()->sync($data['mahasiswa_ids']);
+        }
+
+        return response()->json($kela->load('mahasiswa'));
+    }
+
+
+    // Delete kelas
+    public function destroy(Request $request, Kelas $kela)
+    {
+        // Pastikan hanya dosen pemilik kelas yang bisa hapus
+        if ($kela->dosen_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses untuk menghapus kelas ini.'
+            ], 403);
+        }
+
+        $kela->delete();
+
+        return response()->json([
+            'message' => 'Kelas berhasil dihapus.'
+        ]);
+    }
 }
