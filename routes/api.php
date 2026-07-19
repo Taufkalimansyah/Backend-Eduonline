@@ -58,7 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Absensi — dosen kelola & lihat rekap
     Route::get('/classes/{kela}/attendance', [AbsensiController::class, 'index']);
     Route::post('/classes/{kela}/attendance', [AbsensiController::class, 'store'])->middleware('role:dosen');
+<<<<<<< HEAD
+    Route::put('/attendance/{absensi}', [AbsensiController::class, 'update'])->middleware('role:dosen');
+    Route::delete('/attendance/{absensi}', [AbsensiController::class, 'destroy'])->middleware('role:dosen');
+=======
     
+>>>>>>> main
 
     // Pengumuman — admin buat, semua role baca
     Route::get('/announcements', [PengumumanController::class, 'index']);
