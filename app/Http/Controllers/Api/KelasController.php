@@ -18,16 +18,21 @@ class KelasController extends Controller
     {
         $user = $request->user();
 
-        $query = Kelas::with(['dosen', 'materi', 'tugas']);
+        $query = Kelas::with([
+            'dosen',
+            'materi',
+            'tugas',
+        ])->withCount('mahasiswa');
 
         if ($user->isMahasiswa()) {
-            $query->whereHas('mahasiswa', fn ($q) => $q->where('users.id', $user->id));
+            $query->whereHas('mahasiswa', fn ($q) =>
+                $q->where('users.id', $user->id)
+            );
         } elseif ($user->isDosen()) {
             $query->where('dosen_id', $user->id);
         }
-        // admin: tanpa filter, melihat semua kelas
 
-        return response()->json($query->get());
+        return response()->json($query->latest()->get());
     }
 
     public function show(Kelas $kela)
