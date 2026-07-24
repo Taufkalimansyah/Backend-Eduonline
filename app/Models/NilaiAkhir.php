@@ -11,6 +11,7 @@ class NilaiAkhir extends Model
 
     protected $table = 'nilai_akhir';
     protected $fillable = ['kelas_id', 'mahasiswa_id', 'nilai_tugas', 'nilai_kuis', 'nilai_ujian'];
+    protected $appends = ['rata_rata']; // TAMBAHKAN INI
 
     public function kelas() { return $this->belongsTo(Kelas::class); }
     public function mahasiswa() { return $this->belongsTo(User::class, 'mahasiswa_id'); }
