@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/assignments/{tuga}', [TugasController::class, 'update'])->middleware('role:dosen');
     Route::delete('/assignments/{tuga}', [TugasController::class, 'destroy'])->middleware('role:dosen');
     Route::post('/assignments/{tugas}/submissions', [PengumpulanTugasController::class, 'store'])->middleware('role:mahasiswa');
+    Route::get('/my-submissions', [PengumpulanTugasController::class, 'indexForMahasiswa'])->middleware('role:mahasiswa'); 
     Route::get('/submissions', [PengumpulanTugasController::class, 'indexForDosen'])->middleware('role:dosen');
     Route::put('/submissions/{pengumpulan_tugas}', [PengumpulanTugasController::class, 'grade'])->middleware('role:dosen');
     Route::get('/submissions/{pengumpulan_tugas}/download', [PengumpulanTugasController::class, 'download']);
@@ -64,11 +65,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Absensi — dosen kelola & lihat rekap
     Route::get('/classes/{kela}/attendance', [AbsensiController::class, 'index']);
+    Route::get('/attendance/{absensi}/detail', [AbsensiController::class, 'detail']);
     Route::post('/classes/{kela}/attendance', [AbsensiController::class, 'store'])->middleware('role:dosen');
     Route::put('/attendance/{absensi}', [AbsensiController::class, 'update'])->middleware('role:dosen');
     Route::delete('/attendance/{absensi}', [AbsensiController::class, 'destroy'])->middleware('role:dosen');
-    Route::put('/attendance/{absensi}', [AbsensiController::class, 'update'])->middleware('role:dosen');
-    Route::delete('/attendance/{absensi}', [AbsensiController::class, 'destroy'])->middleware('role:dosen');
+        Route::post('/attendance/{absensi}/isi', [AbsensiController::class, 'isi'])->middleware('role:mahasiswa');
 
     // Pengumuman — admin buat, semua role baca
     Route::get('/announcements', [PengumumanController::class, 'index']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\PengumpulanTugas;
+use App\Models\NilaiAkhir;
 use App\Models\Tugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ class PengumpulanTugasController extends Controller
         return response()->json($submissions);
     }
 
-    // Dosen input nilai (0-100) + feedback -> langsung update database
+    // Dosen input nilai (0-100) + feedback -> update database + auto-sync ke NilaiAkhir
     public function grade(Request $request, PengumpulanTugas $pengumpulan_tugas)
     {
         $data = $request->validate([
@@ -55,6 +56,22 @@ class PengumpulanTugasController extends Controller
 
         $pengumpulan_tugas->update($data);
 
+        // Auto-sync: hitung rata-rata semua tugas mahasiswa ini di kelas yang sama,
+        // lalu simpan ke NilaiAkhir.nilai_tugas
+        $pengumpulan_tugas->load('tugas');
+        $kelasId = $pengumpulan_tugas->tugas->kelas_id;
+        $mahasiswaId = $pengumpulan_tugas->mahasiswa_id;
+
+        $rataRataTugas = PengumpulanTugas::whereHas('tugas', fn ($q) => $q->where('kelas_id', $kelasId))
+            ->where('mahasiswa_id', $mahasiswaId)
+            ->whereNotNull('nilai')
+            ->avg('nilai');
+
+        NilaiAkhir::updateOrCreate(
+            ['kelas_id' => $kelasId, 'mahasiswa_id' => $mahasiswaId],
+            ['nilai_tugas' => round($rataRataTugas)]
+        );
+
         return response()->json($pengumpulan_tugas);
     }
 
@@ -62,4 +79,15 @@ class PengumpulanTugasController extends Controller
     {
         return Storage::disk('public')->download($pengumpulan_tugas->file_path, $pengumpulan_tugas->file_name);
     }
+
+    // Mahasiswa lihat submission miliknya sendiri (untuk halaman Nilai)
+    public function indexForMahasiswa(Request $request)
+        {
+            $submissions = PengumpulanTugas::with(['tugas.kelas'])
+                ->where('mahasiswa_id', $request->user()->id)
+                ->latest('submitted_at')
+                ->get();
+
+            return response()->json($submissions);
+        }
 }
